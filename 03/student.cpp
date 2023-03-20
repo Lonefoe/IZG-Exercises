@@ -145,10 +145,8 @@ void pinedaTriangle(const Point &v1, const Point &v2, const Point &v3, const RGB
     //////// DOPLNTE KOD /////////
     int delta_y1 = v2.y - v1.y;
     int delta_x1 = v2.x - v1.x;
-
     int delta_y2 = v3.y - v2.y;
     int delta_x2 = v3.x - v2.x;
-
     int delta_y3 = v1.y - v3.y;
     int delta_x3 = v1.x - v3.x;
 
@@ -216,8 +214,7 @@ void pinedaPolygon(const Point *points, const int size, const RGBA &color1, cons
     minY = MAX(minY, 0);
     maxY = MIN(maxY, height - 1);
 
-    // Hranove funkce
-
+    // Edge deltas
     EdgeParams edgeParams(size);
 
     for (int i = 0; i < size; i++)
@@ -226,15 +223,15 @@ void pinedaPolygon(const Point *points, const int size, const RGBA &color1, cons
         edgeParams[i].deltaY = points[(i + 1) % size].y - points[i].y;
     }
     
+    // Edge values
     EdgeFncValues edgeFncValues(size);
-
-    // Filling
 
     for (int i = 0; i < size; i++)
     {
         edgeFncValues[i] = (minY - points[i].y) * edgeParams[i].deltaX - (minX - points[i].x) * edgeParams[i].deltaY;
     }
 
+    // Filling
     for (int y = minY; y <= maxY; ++y)
     {
         EdgeFncValues _edgeFncValues = edgeFncValues;
@@ -244,18 +241,15 @@ void pinedaPolygon(const Point *points, const int size, const RGBA &color1, cons
             int found = 0;
             for (int i = 0; i < size; i++)
             {
-                if (0 <= _edgeFncValues[i]) found++;
+                if (0 <= _edgeFncValues[i]) {
+                    found++;
+                }
+                _edgeFncValues[i] -= edgeParams[i].deltaY;
             }
 
             if (found >= size) {
                 putPixel(x, y, color1);
             }
-
-            for (int i = 0; i < size; i++)
-            {
-                _edgeFncValues[i] -= edgeParams[i].deltaY;
-            }
- 
         }
 
         for (int i = 0; i < size; i++)
